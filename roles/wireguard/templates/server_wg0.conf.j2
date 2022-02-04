@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+[Interface]
+Address = 10.0.1.1/32
+ListenPort = 51820
+PrivateKey = {{ server_privkey }}
+
+[Peer]
+{% for item in clients %}
+PublicKey = {{ item.client_pubkey }}
+AllowedIPs = 10.0.1.{{loop.index + 1}}/32
+{% endfor %}

@@ -1,0 +1,48 @@
+---
+- name: Install docker packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state:
+      latest
+
+- name: install wireguard package
+  apt:
+    name: wireguard
+    state: present
+    update_cache: yes
+
+- name: Server config
+  template:
+    dest: /etc/wireguard/wg0.conf
+    src: server_wg0.conf.j2
+    owner: root
+    group: root
+    mode: '0600'
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html
+- name: enable and persist ip forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: yes
+    reload: yes
+
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+- name: start wireguard and enable on boot
+  systemd:
+    name: wg-quick@wg0
+    enabled: yes
+    state: restarted
+
+
+# - name: reload wireguard config
+#   shell: wg syncconf wg0 <(wg-quick strip wg0)
+#   args:
+#     executable: /bin/bash
+
+
+
