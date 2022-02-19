@@ -38,11 +38,10 @@
     enabled: yes
     state: restarted
 
-
-# - name: reload wireguard config
-#   shell: wg syncconf wg0 <(wg-quick strip wg0)
-#   args:
-#     executable: /bin/bash
+- name: reload wireguard config
+  shell: wg syncconf wg0 <(wg-quick strip wg0)
+  args:
+    executable: /bin/bash
 
 
 

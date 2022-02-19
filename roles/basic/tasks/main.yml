@@ -3,11 +3,16 @@
 - name: Install Prerequisites
   apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
 
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{inventory_hostname}}"
+
 # Sudo Group Setup
 - name: Make sure we have a 'wheel' group
   group:
     name: wheel
     state: present
+
 - name: Allow 'wheel' group to have passwordless sudo
   lineinfile:
     path: /etc/sudoers
@@ -15,6 +20,7 @@
     regexp: '^%wheel'
     line: '%wheel ALL=(ALL) NOPASSWD: ALL'
     validate: '/usr/sbin/visudo -cf %s'
+
 # User + Key Setup
 - name: Create a new regular user with sudo privileges
   user:

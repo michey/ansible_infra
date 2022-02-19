@@ -1,0 +1,76 @@
+---
+- name: Add a user named "kube" that will be used for remote access
+  ansible.builtin.user:
+    name: kube
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+    createhome: yes
+
+- name: Allow the 'kube' user to have passwordless sudo as a convenience
+  ansible.builtin.lineinfile:
+    dest: /etc/sudoers
+    line: 'kube ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Allow root SSH users to SSH as user 'kube' 
+  ansible.posix.synchronize:
+    src: /root/.ssh
+    dest: /home/kube
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: Change /home/kube/.ssh's owner
+  ansible.builtin.file:
+    path: /home/kube/.ssh
+    state: directory
+    recurse: yes
+    owner: kube
+    group: kube
+
+- name: Update apt repositories
+  apt:
+    update_cache: yes
+
+- name: Download k3s install script
+  get_url:
+    url: https://get.k3s.io 
+    dest: /home/kube/k3s_install.sh
+    mode: a+x
+
+- name: Execute k3s_install.sh
+  shell: INSTALL_K3S_EXEC="--flannel-iface={{ hostvars['rose.fidonode.me'].private_iface }} --node-name 'rose.fidonode.me' --disable traefik --write-kubeconfig-mode \"0644\"" /home/kube/k3s_install.sh >> /home/kube/k3s_install_log.txt
+  args:
+    chdir: /home/kube
+    creates: k3s_install_log.txt
+
+# - name: Move kubectl config
+#   copy:
+#     remote_src: true
+#     src: /etc/rancher/k3s/k3s.yaml
+#     dest: /home/ubuntu/.kube/config
+#     owner: ubuntu
+#     group: ubuntu
+
+
+- name: Donwload flux install script
+  get_url:
+    url: https://fluxcd.io/install.sh 
+    dest: /home/kube/flux_install.sh
+    mode: a+x
+
+- name: Execute flux_install.sh
+  shell: /home/kube/flux_install.sh >> /home/kube/flux_install_log.txt
+  args:
+    chdir: /home/kube
+    creates: flux_install_log.txt
+
+- name: Check flux prerequirements
+  shell: KUBECONFIG="/etc/rancher/k3s/k3s.yaml" flux check --pre
+  args:
+    executable: /bin/bash
+
+- name: Bootstrap flux
+  shell: KUBECONFIG="/etc/rancher/k3s/k3s.yaml" GITHUB_USER="michey" GITHUB_TOKEN="{{gh_token}}" flux bootstrap github --owner=michey --repository=flux-infra --branch=main --path=./clusters/remote --personal >> /home/kube/flux_bootstrap_log.txt
+  args:
+    chdir: /home/kube
+    creates: flux_bootstrap_log.txt
