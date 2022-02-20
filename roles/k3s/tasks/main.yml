@@ -38,7 +38,7 @@
     mode: a+x
 
 - name: Execute k3s_install.sh
-  shell: INSTALL_K3S_EXEC="--flannel-iface={{ hostvars['rose.fidonode.me'].private_iface }} --node-name 'rose.fidonode.me' --disable traefik --write-kubeconfig-mode \"0644\"" /home/kube/k3s_install.sh >> /home/kube/k3s_install_log.txt
+  shell: INSTALL_K3S_EXEC="--flannel-iface={{ hostvars['rose.fidonode.me'].private_iface }} --node-ip={{ hostvars['rose.fidonode.me'].private_ip }} --disable-network-policy --node-name 'rose.fidonode.me' --disable traefik --write-kubeconfig-mode \"0644\"" /home/kube/k3s_install.sh >> /home/kube/k3s_install_log.txt
   args:
     chdir: /home/kube
     creates: k3s_install_log.txt

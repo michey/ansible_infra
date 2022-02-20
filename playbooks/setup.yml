@@ -34,6 +34,7 @@
   roles:
     - basic
     - wireguard
+    - iptables-legacy
     - ufw
     - k3s
 

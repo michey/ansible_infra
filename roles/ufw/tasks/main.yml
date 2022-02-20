@@ -1,14 +1,54 @@
----
-# UFW Setup
-- name: UFW - Allow SSH connections
-  ufw:
-    rule: allow
-    name: OpenSSH
+# ---
+
+# - name: Allow everything and enable UFW
+#   ufw:
+#     state: enabled
+
+# # UFW Setup
+# - name: UFW - Allow SSH connections
+#   ufw:
+#     rule: allow
+#     name: OpenSSH
 
 
-# UFW Setup
-- name: UFW - Allow wireguad
-  ufw:
-    rule: allow
-    port: 51820
-    proto: udp
+# # UFW Setup
+# - name: UFW - Allow wireguad
+#   ufw:
+#     rule: allow
+#     port: 51820
+#     proto: udp
+
+
+# - name: UFW - Allow http
+#   ufw:
+#     rule: allow
+#     port: 80
+#     proto: tcp
+
+
+# - name: UFW - Allow https
+#   ufw:
+#     rule: allow
+#     port: 443
+#     proto: tcp
+
+
+# - name: UFW - Allow kube control
+#   ufw:
+#     rule: allow
+#     port: 6443
+#     proto: tcp
+
+
+# - name: Allow all access from RFC1918 networks to this host
+#   community.general.ufw:
+#     rule: allow
+#     src: '{{ item }}'
+#   loop:
+#     - 10.0.0.0/8
+#     - 172.16.0.0/12
+#     - 192.168.0.0/16
+
+# - name: Reload UFW
+#   ufw:
+#     state: reloaded

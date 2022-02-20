@@ -23,13 +23,13 @@
     mode: '0600'
 
 # https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html
-- name: enable and persist ip forwarding
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: "1"
-    state: present
-    sysctl_set: yes
-    reload: yes
+# - name: enable and persist ip forwarding
+#   sysctl:
+#     name: net.ipv4.ip_forward
+#     value: "1"
+#     state: present
+#     sysctl_set: yes
+#     reload: yes
 
 # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
 - name: start wireguard and enable on boot
